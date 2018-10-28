@@ -7,10 +7,17 @@ from matplotlib import pyplot as plt
 import glob
 from copy import deepcopy
 from scipy.cluster.vq import kmeans2
+from scipy import linalg
+from pynrnmf import NRNMF
+import warnings
+from networkx.algorithms.community import greedy_modularity_communities
+import networkx as nx
+
+warnings.filterwarnings("ignore")
 
 SAMPLES = 100
-CANCER_TYPES = 10 # How many of the types of cancer should we use
-normalize = True
+CANCER_TYPES = 1000 # How many of the types of cancer should we use
+normalize = False
 outliers = True
 
 markerStyles = ('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')
@@ -88,6 +95,49 @@ def createNN():
 
     g.show("basic.html")
 
+def communityDetection():
+    """ Runs the Classet-Newmann community detection algorithm """
+    nn = createNearestNeighbor(allData,k=5,metric="Cosine")
+
+    g = nx.Graph()
+    for cancer in range(len(cancerNames)):
+        for nodeNumber in range(startingPositions[cancer],startingPositions[cancer+1]):
+            g.add_node(nodeNumber)
+
+    for i in range(nn.shape[0]):
+        for j in range(nn.shape[1]):
+            if(nn[i][j]):
+                g.add_edge(i,j)
+
+    #Amount of each cancer type in each community
+    communities = greedy_modularity_communities(g)
+    cancerTypes = []
+
+    #The cutoff to be put in the community detection part
+    percentCutoff = 0.05
+    
+    for community in communities:
+        tempCancers = {}
+        for i in range(1,len(startingPositions)):
+            #Num inbetween
+            cancersInbetween = len([x for x in community if startingPositions[i-1]<=x<startingPositions[i]])
+            tempCancers[cancerNames[i-1]] = cancersInbetween
+
+        totalCancers = sum(tempCancers.values())
+
+        #Sort by prevelance
+        sortedCancers = sorted(tempCancers, key=tempCancers.get,reverse=True)        
+        t = {}
+        for cancer in sortedCancers:
+            if(tempCancers[cancer]>=totalCancers * percentCutoff):
+                t[cancer] = tempCancers[cancer]
+        
+        cancerTypes.append(t)
+        
+
+    return cancerTypes
+
+
 def createTSNE():
     """ Creates a TSNE graph """
     
@@ -119,10 +169,25 @@ def createTSNE():
     plt.legend(newHandles,newLabels)
     plt.show()
 
+def factorData(k=5):
+    nn = np.array(createNearestNeighbor(allData,k=5,metric="Cosine"))
+    model = NRNMF(k=k,W=nn,alpha=10000,init='random',n_inits=1, max_iter=50000, n_jobs=1)
+    U, V = model.fit_transform(allData.T)
+    reconstructionError = np.linalg.norm(allData.T-U.dot(V.T))
+    print("Reconstruction Error with graph regularization",reconstructionError)
+    
+    model = NRNMF(k=k,W=nn,alpha=0,init='random',n_inits=1, max_iter=50000, n_jobs=1)
+    U, V = model.fit_transform(allData.T)
+    reconstructionError = np.linalg.norm(allData.T-U.dot(V.T))
+    print("Reconstruction Error without graph regularization",reconstructionError)
+
+
+
+alexandrovFiles = glob.glob("alexandrov_data/*.txt")
+
 startingPositions = []
 allData = np.empty((0,0),dtype=np.float)
 
-alexandrovFiles = glob.glob("alexandrov_data/*.txt")
 if(CANCER_TYPES<len(alexandrovFiles)):
     alexandrovFiles = np.random.choice(alexandrovFiles,CANCER_TYPES,replace=False)
 CANCER_TYPES = len(alexandrovFiles)
@@ -155,4 +220,7 @@ startingPositions.append(allData.shape[0])
 if(normalize):
     allData = normalizeRows(allData)
 
-createTSNE()
+communityList = communityDetection()
+for community in communityList:
+    print(community)
+
