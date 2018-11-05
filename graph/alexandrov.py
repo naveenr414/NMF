@@ -249,11 +249,13 @@ if(normalize):
     allData = normalizeRows(allData)
 
 np.savetxt("allData.csv", allData, delimiter=",")
-#factorData(k=CANCER_TYPES)
+
+
+factorData(k=5)
 
 #createTSNE()
 
-c = communityDetection()
+#c = communityDetection()
 
 """for community in c:
     print(community)
