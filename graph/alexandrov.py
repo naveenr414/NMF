@@ -1,4 +1,4 @@
-from util import createNearestNeighbor
+from util import createNearestNeighbor, createNearestNeighborEpsilon
 import numpy as np
 from pyvis.network import Network
 import random
@@ -15,10 +15,11 @@ import networkx as nx
 
 warnings.filterwarnings("ignore")
 
-SAMPLES = 100
-CANCER_TYPES = 1000 # How many of the types of cancer should we use
+SAMPLES = 10
+CANCER_TYPES = 10 # How many of the types of cancer should we use
 normalize = False
 outliers = True
+restrictSamples = False
 
 markerStyles = ('o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')
 
@@ -97,7 +98,8 @@ def createNN():
 
 def communityDetection():
     """ Runs the Classet-Newmann community detection algorithm """
-    nn = createNearestNeighbor(allData,k=5,metric="Cosine")
+    nn = createNearestNeighborEpsilon(allData,metric="Cosine")
+    print(nn)
 
     g = nx.Graph()
     for cancer in range(len(cancerNames)):
@@ -113,30 +115,49 @@ def communityDetection():
     communities = greedy_modularity_communities(g)
     cancerTypes = []
 
+    print(communities)
+
     #The cutoff to be put in the community detection part
-    percentCutoff = 0.05
+    percentCutoff = 0
+
+    csvData = np.zeros((CANCER_TYPES,len(communities)))
     
-    for community in communities:
+    
+    for j,community in enumerate(communities):
         tempCancers = {}
         for i in range(1,len(startingPositions)):
             #Num inbetween
             cancersInbetween = len([x for x in community if startingPositions[i-1]<=x<startingPositions[i]])
             tempCancers[cancerNames[i-1]] = cancersInbetween
+            csvData[i-1,j] = int(cancersInbetween)
 
         totalCancers = sum(tempCancers.values())
 
+        
         #Sort by prevelance
         sortedCancers = sorted(tempCancers, key=tempCancers.get,reverse=True)        
         t = {}
         for cancer in sortedCancers:
             if(tempCancers[cancer]>=totalCancers * percentCutoff):
-                t[cancer] = tempCancers[cancer]
+                t[cancer] = (tempCancers[cancer],round(tempCancers[cancer]/totalCancers,2))
         
         cancerTypes.append(t)
-        
 
-    return cancerTypes
+    w = open("communityCSV.csv","w")
+    for i in range(csvData.shape[0]):
+        tempLine = cancerNames[i]+","
+        tempLine+=",".join(list(map(str,csvData[i])))
+        tempLine+="\n"
+        w.write(tempLine)
 
+    w.close()
+
+    return csvData
+
+def histogram(v,title):
+    plt.title(title)
+    plt.bar(np.arange(len(v)), v, align='center', alpha=0.5)
+    plt.show()
 
 def createTSNE():
     """ Creates a TSNE graph """
@@ -145,7 +166,7 @@ def createTSNE():
     if(not outliers):
         embedded = removeOutliers(embedded)
 
-    clusters = kmeans2(embedded,4,minit='points')
+    clusters = kmeans2(embedded,CANCER_TYPES,minit='points')
     labels = clusters[1]
     clusters = clusters[0]
     
@@ -155,7 +176,7 @@ def createTSNE():
         if(startingPositions[cancerType+1]==i):
             cancerType+=1
 
-        plt.scatter(embedded[i][0],embedded[i][1],c=colors[cancerType],label=cancerNames[cancerType],marker=markerStyles[labels[i]])
+        plt.scatter(embedded[i][0],embedded[i][1],c=colors[cancerType],label=cancerNames[cancerType],marker=markerStyles[labels[i] % len(markerStyles)])
 
     handles, labels = plt.gca().get_legend_handles_labels()
     newLabels, newHandles = [], []
@@ -181,8 +202,7 @@ def factorData(k=5):
     reconstructionError = np.linalg.norm(allData.T-U.dot(V.T))
     print("Reconstruction Error without graph regularization",reconstructionError)
 
-
-
+#This sections inits all the cancer types 
 alexandrovFiles = glob.glob("alexandrov_data/*.txt")
 
 startingPositions = []
@@ -193,34 +213,55 @@ if(CANCER_TYPES<len(alexandrovFiles)):
 CANCER_TYPES = len(alexandrovFiles)
 
 cancerNames = [i.split("\\")[-1].replace("_","").split("exome")[0] for i in alexandrovFiles]
-printCancers()
 
 colors = generateColors(len(cancerNames))
+unusedCancers = []
 
 #Combines the data from each of the samples
-for file in alexandrovFiles:
+for i,file in enumerate(alexandrovFiles):
     cancerData = toArray(file)
     sampleRows = cancerData.shape[0]    
     selectedSamples = np.random.choice(sampleRows,min(sampleRows,SAMPLES),replace=False)
+    print(min(sampleRows,SAMPLES))
 
-    if(len(startingPositions)==0):
-        startingPositions.append(0)
-    else:
+
+    if(sampleRows>=SAMPLES or True):
+        if(len(startingPositions)==0):
+            startingPositions.append(0)
+
         startingPositions.append(startingPositions[-1] + min(sampleRows,SAMPLES))
-    
-    cancerData = cancerData[selectedSamples]
-    
-    if(allData.size == 0): 
-        allData = cancerData
-    else:
-        allData = np.append(allData,cancerData,axis=0)
 
-startingPositions.append(allData.shape[0])
+
+        cancerData = cancerData[selectedSamples]
+        
+        if(allData.size == 0): 
+            allData = cancerData
+        else:
+            allData = np.append(allData,cancerData,axis=0)
+    else:
+        unusedCancers.append(i)
+
+cancerNames = [i for j,i in enumerate(cancerNames) if j not in unusedCancers]
+CANCER_TYPES = len(cancerNames)
+
 
 if(normalize):
     allData = normalizeRows(allData)
 
-communityList = communityDetection()
-for community in communityList:
-    print(community)
+np.savetxt("allData.csv", allData, delimiter=",")
+#factorData(k=CANCER_TYPES)
 
+#createTSNE()
+
+c = communityDetection()
+
+"""for community in c:
+    print(community)
+"""
+
+
+
+"""
+for i in range(19,26):
+    factorData(k=i)
+"""
