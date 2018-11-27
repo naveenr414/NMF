@@ -1,3 +1,4 @@
+library("SomaticSignatures")
 temp = read.csv(file.choose(), sep=",")
 allData <- as.matrix(temp) 
 
