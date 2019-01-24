@@ -3,8 +3,9 @@ import glob
 import random
 import numpy as np
 import scipy
+import time 
 
-SAMPLES = 100
+SAMPLES = 10000
 CANCER_TYPES = 1 # How many of the types of cancer should we use
 normalize = False
 outliers = True
@@ -53,8 +54,8 @@ def normalizeRows(mat):
 
     return mat
 #This sections inits all the cancer types 
-alexandrovFiles = ['alexandrov_data/breast_exome.txt']#glob.glob("alexandrov_data/*.txt")
-
+alexandrovFiles = ["alexandrov_data/squamos_exome.txt"]#glob.glob("alexandrov_data/*.txt")
+print(alexandrovFiles)
 startingPositions = []
 allData = np.empty((0,0),dtype=np.float)
 
@@ -70,8 +71,10 @@ unusedCancers = []
 #Combines the data from each of the samples
 for i,file in enumerate(alexandrovFiles):
     cancerData = toArray(file)
-    sampleRows = cancerData.shape[0]    
-    selectedSamples = np.random.choice(sampleRows,min(sampleRows,SAMPLES),replace=False)
+    sampleRows = cancerData.shape[0]
+    
+    selectedSamples = sorted(np.random.choice(sampleRows,min(sampleRows,SAMPLES),replace=False))
+
 
     if(sampleRows>=SAMPLES or True):
         if(len(startingPositions)==0):
@@ -274,8 +277,7 @@ def Gp(X,Q,Y,L,lambOne,lambTwo,Xk1,rhok1,sigma,gr):
     m+=lambTwo*np.linalg.norm(X,ord='nuc')
     return m
 
-def matrixComplete(W,k,lambOne,lambTwo,sigma,rhoK1=1000,gamma=100):    
-    np.random.seed()
+def matrixComplete(W,k,lambOne,lambTwo,sigma,rhoK1=1000,gamma=100):
     percent = .05
     Q = GNMF(allData.T,W,0,n_components=k,tol=1e-4,max_iter=100,verbose=False)[0]
     Q = Q.T
@@ -288,21 +290,25 @@ def matrixComplete(W,k,lambOne,lambTwo,sigma,rhoK1=1000,gamma=100):
     eList = [np.zeros((allData.shape[0],1)) for i in range(allData.shape[0])]
     for i in range(len(eList)):
         eList[i][i] = 1
-    
+
 
     QList = [Q[:,[i]] for i in range(Q.shape[1])]
     listOf = [[(QList[i]).dot(eList[j].T) for j in range(len(eList))] for i in range(len(QList))]
 
     for i,j in notSigma:
         Y[i][j] = -1
-    
-    
+
+
     rhoK = rhoK1
     Xk1 = np.random.rand(Q.shape[0],allData.shape[0])
+    Xk1*=(np.linalg.norm(Y,ord='nuc')/np.linalg.norm(Q,ord='nuc'))/(Xk1.size)
+    Xk = Xk1
+    dif = 1000000
 
-    for i in range(10):
+    while(dif>.001):
         gr = grad(Xk1,Q,Y,L,lambOne,sigma,listOf)
         Xk = D(Xk1 - 1/(rhoK1)*gr,lambTwo/rhoK1)
+        dif = np.linalg.norm(Xk-Xk1)
         rhoK = rhoK1
         l = h(Xk,Q,Y,L,lambOne,lambTwo,sigma)
         r = Gp(Xk,Q,Y,L,lambOne,lambTwo,Xk1,rhoK,sigma,gr)
@@ -316,65 +322,97 @@ def matrixComplete(W,k,lambOne,lambTwo,sigma,rhoK1=1000,gamma=100):
     return Q,Xk
 
 import random
+import multiprocessing 
 
 k = 10
-threshold = 0.95
-W = createNearestNeighborEpsilon(allData)
-sigma = [(i,j) for i in range(allData.shape[0]) for j in range(allData.shape[1]) if random.random()<threshold]
 
-def gridSearch(W,k,lamb,rhoK1,gamma):
+def gridSearch(W,k,lamb,rhoK1,gamma,sigma):
+
+    al = [(i,j) for i in range(allData.shape[0]) for j in range(allData.shape[1])]
+    notSigma = list(set(al)-set(sigma))
+
+    
     Q, Xk = matrixComplete(W,k,lamb,0,sigma,rhoK1=10**rhoK1,gamma=10**gamma)
     mat = allData-(Q.T.dot(Xk)).T
     
-    reconstructionError = np.linalg.norm(mat)**2-sum([mat[j,k]**2 for j,k in sigma])
+    reconstructionError = sum([mat[j,k]**2 for j,k in notSigma])
     reconstructionError = np.sqrt(reconstructionError)
 
-    return (reconstructionError,(lamb,rhoK1,gamma))
+    return reconstructionError
 
-import time
-import multiprocessing as mp
+def run(W,lamb,iterations=5,rhoCenters=4,gammaCenters=1):
+    import time
+    np.random.seed(seed)
 
-a = time.time()
+    threshold = 0.9
+    sigma = [(i,j) for i in range(allData.shape[0]) for j in range(allData.shape[1]) if np.random.random()<threshold]
 
-k=10
+    a = time.time() 
 
-lambList = [0.1]
-rhoCenters = [2 for i in range(len(lambList))]
-gammaCenters = [2 for i in range(len(lambList))]
-scores = [10000000 for i in range(len(lambList))]
-std = 1
+    k=10
 
-for iteration in range(1):
-    for i in range(len(lambList)):
-        lamb = lambList[i]
-        rhoKList = [rhoCenters[i]+std*t for t in range(-1,2)]
-        gammaList = [gammaCenters[i]+std*t for t in range(-1,2)]
+    scores = gridSearch(W,k,lamb,rhoCenters,gammaCenters,sigma)
+    std = 1
+
+    for iteration in range(iterations):
+        rhoKList = [max(rhoCenters+std*t,0.1) for t in range(-1,2)]
+        gammaList = [max(gammaCenters+std*t,0.1) for t in range(-1,2)]
+
+        processList = []
         for rhoK1 in rhoKList:
             for gamma in gammaList:
-                print(gridSearch(W,k,lamb,rhoK1,gamma))
+                re = gridSearch(W,k,lamb,rhoK1,gamma,sigma)
+                if(re<scores):
+                    scores = re
+                    rhoCenters = rhoK1
+                    gammaCenters=gamma
+
+        std/=1.5
+
+     
+    return scores,[rhoCenters,gammaCenters]
 
 
+W1 = createNearestNeighborEpsilon(allData,0.1)
+W2 = createNearestNeighborEpsilon(allData,0.2)
+W3 = createNearestNeighborEpsilon(allData,0.3)
+WE = createNearestNeighborExponential(allData)
+W1N = createNearestNeighborEpsilon(allData,0.1,metric="Norm")
+W2N = createNearestNeighborEpsilon(allData,0.2,metric="Norm")
+W3N = createNearestNeighborEpsilon(allData,0.3,metric="Norm")
+Wk = createNearestNeighbor(allData,k=5)
+WKe = createNearestNeighbor(allData,k=5,metric='Cosine')
+
+WK = [createNearestNeighbor(allData,k=i) for i in range(2,9)]
+
+def trial():
+    goal = run(W1,0)
+    print("baseline",goal[0])
+    settings = goal[1]
+    goal = goal[0]
+    score = [run(createNearestNeighbor(allData,k=i),0.1)[0] for i in range(1,10)]
+    print(score.index(min(score)),score)
+    score = min(score)
+    return round(score/goal,2)
+
+trialList = []
+while True:
+    t = time.time()
+    seed = random.randint(1,10000000)
+    trialList.append(trial())
+    print(trialList[-1],sum(trialList)/len(trialList))
+    print("time",time.time()-t)
 
 
 """
-    print(results)
-    std/=1.5
+scores = [[] for i in range(8)]
+trials = 5
 
-    for i in results:
-        reconstructionError = i[0]
-        lamb = i[1][0]
-        lambNumber = lambList.index(lamb)
-        rho = i[1][1]
-        gamma = i[1][2]
-        if(reconstructionError<scores[lambNumber]):
-            scores[lambNumber] = reconstructionError
-            rhoCenters[lambNumber] = rho
-            gammaCenters[lambNumber] = gamma
-            
-    #for i in range(len(lambList)):
-    #    print(lambList[i],scores[i],rhoCenters[i],gammaCenters[i])
-        
+for trial in range(1):
+    seed = 10
+    scores[0].append(run(WK[0],0))
+
+    for num,i in enumerate(WK):
+        scores[num+1].append(run(i,0.05))
+    print(trial)
 """
-print("Time taken parallel",int(time.time()-a))
-
-

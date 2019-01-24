@@ -321,14 +321,13 @@ threshold = 0.95
 W = createNearestNeighborEpsilon(allData)
 sigma = [(i,j) for i in range(allData.shape[0]) for j in range(allData.shape[1]) if random.random()<threshold]
 
-def gridSearch(W,k,lamb,rhoK1,gamma,output):
+def gridSearch(W,k,lamb,rhoK1,gamma):
     Q, Xk = matrixComplete(W,k,lamb,0,sigma,rhoK1=10**rhoK1,gamma=10**gamma)
     mat = allData-(Q.T.dot(Xk)).T
     
     reconstructionError = np.linalg.norm(mat)**2-sum([mat[j,k]**2 for j,k in sigma])
     reconstructionError = np.sqrt(reconstructionError)
 
-    output.put((reconstructionError,(lamb,rhoK1,gamma)))
     return (reconstructionError,(lamb,rhoK1,gamma))
 
 import time
@@ -351,7 +350,7 @@ for iteration in range(1):
         gammaList = [gammaCenters[i]+std*t for t in range(-1,2)]
         for rhoK1 in rhoKList:
             for gamma in gammaList:
-                print(gridSearch(W,k,lamb,rhoK1,gamma,output))
+                print(gridSearch(W,k,lamb,rhoK1,gamma))
 
 
 
