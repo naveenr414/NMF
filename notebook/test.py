@@ -3,7 +3,8 @@ import glob
 import random
 import numpy as np
 import scipy
-import time 
+import time
+from sklearn.decomposition import NMF
 
 SAMPLES = 10000
 CANCER_TYPES = 1 # How many of the types of cancer should we use
@@ -54,7 +55,7 @@ def normalizeRows(mat):
 
     return mat
 #This sections inits all the cancer types 
-alexandrovFiles = ["alexandrov_data/squamos_exome.txt"]#glob.glob("alexandrov_data/*.txt")
+alexandrovFiles = ["alexandrov_data/bladder_exome.txt"]#glob.glob("alexandrov_data/*.txt")
 print(alexandrovFiles)
 startingPositions = []
 allData = np.empty((0,0),dtype=np.float)
@@ -279,8 +280,7 @@ def Gp(X,Q,Y,L,lambOne,lambTwo,Xk1,rhok1,sigma,gr):
 
 def matrixComplete(W,k,lambOne,lambTwo,sigma,rhoK1=1000,gamma=100):
     percent = .05
-    Q = GNMF(allData.T,W,0,n_components=k,tol=1e-4,max_iter=100,verbose=False)[0]
-    Q = Q.T
+    
     sigma = [(j,i) for i,j in sigma]
     L = csgraph.laplacian(W, normed=False)
     Y = deepcopy(allData).T
@@ -292,11 +292,15 @@ def matrixComplete(W,k,lambOne,lambTwo,sigma,rhoK1=1000,gamma=100):
         eList[i][i] = 1
 
 
-    QList = [Q[:,[i]] for i in range(Q.shape[1])]
-    listOf = [[(QList[i]).dot(eList[j].T) for j in range(len(eList))] for i in range(len(QList))]
 
     for i,j in notSigma:
         Y[i][j] = -1
+
+
+    Q,X,r = GNMF(allData.T,W,0,n_components=k,tol=1e-4,max_iter=100,verbose=False)
+    Q = Q.T
+    QList = [Q[:,[i]] for i in range(Q.shape[1])]
+    listOf = [[(QList[i]).dot(eList[j].T) for j in range(len(eList))] for i in range(len(QList))]
 
 
     rhoK = rhoK1
@@ -385,24 +389,48 @@ WKe = createNearestNeighbor(allData,k=5,metric='Cosine')
 
 WK = [createNearestNeighbor(allData,k=i) for i in range(2,9)]
 
+
 def trial():
     goal = run(W1,0)
     print("baseline",goal[0])
     settings = goal[1]
     goal = goal[0]
-    score = [run(createNearestNeighbor(allData,k=i),0.1)[0] for i in range(1,10)]
+    score = [run(createNearestNeighbor(allData,k=i),0.1)[0] for i in range(1)]
     print(score.index(min(score)),score)
     score = min(score)
     return round(score/goal,2)
 
+def trial2():
+    np.random.seed(seed)
+    threshold = 0.9
+    sigma = [(i,j) for i in range(allData.shape[0]) for j in range(allData.shape[1]) if np.random.random()<threshold]
+    al = [(i,j) for i in range(allData.shape[0]) for j in range(allData.shape[1])]
+    notSigma = list(set(al)-set(sigma))
+
+
+    Y = deepcopy(allData)
+    for i,j in notSigma:
+        Y[i,j] = 0
+    k = 10
+    model = NMF(n_components=k, init='random', random_state=0)
+    W = model.fit_transform(Y)
+    H = model.components_
+
+    mat = allData-W.dot(H)
+    reconstructionError = sum([mat[j,k]**2 for j,k in notSigma])
+    reconstructionError = np.sqrt(reconstructionError)
+
+    return reconstructionError
+    
 trialList = []
-while True:
+trialList2 = []
+for i in range(40):
     t = time.time()
     seed = random.randint(1,10000000)
     trialList.append(trial())
-    print(trialList[-1],sum(trialList)/len(trialList))
+    print("trialList",trialList[-1],sum(trialList)/len(trialList))
     print("time",time.time()-t)
-
+    
 
 """
 scores = [[] for i in range(8)]
