@@ -5,7 +5,14 @@ import matplotlib.pyplot as plt
 
 create_alexsandrov_data()
 
+def get_average_signature_error(rank):
+    """ Input: Integer rank 
+    Returns the average signature distance """
+    return sum([find_results(rank)["signature"] for i in range(10)])/10
+
 def plot_reconstruction(rank):
+    """ Input: List of Integers
+        Output: Plot of rank vs norm error"""
     percentages = np.arange(0.1,0.9,0.05)
     norms = []
     
@@ -16,6 +23,9 @@ def plot_reconstruction(rank):
     plt.show()
 
 def plot_reconstruction_normalized(rank):
+    """ Input: List of Integers
+    Output: Plot of rank vs norm error (normalized) """
+
     percentages = np.arange(0.1,0.9,0.05)
     norms = []
     
@@ -26,6 +36,9 @@ def plot_reconstruction_normalized(rank):
     plt.show()
 
 def plot_signature_norm(rank_range):
+    """ Input: List of Integers
+        Output: Plot of signature error vs norm error"""
+
     signatures = []
     norms = []
     for rank in rank_range:
@@ -37,6 +50,11 @@ def plot_signature_norm(rank_range):
     plt.show()
 
 def percent_top(rank_range,trials=10,mask=True):
+    """ Input: List of Integers
+        Output: Percent of top 5 of norm intersecting
+        With top 5 signatures"""
+
+
     results = []
 
     for i in range(trials):
@@ -63,6 +81,10 @@ def percent_top(rank_range,trials=10,mask=True):
     return results
 
 def pairs_correct(rank_range,HIDDEN_PERCENT=0.3,mask=True):
+    """ Input: List of Integers
+    Otuput: Percent of (rank,rank) pairs that correctly predicted
+    Signature trend based off norm """
+    
     temp_data = []
     for rank in rank_range:
         if mask:
@@ -85,11 +107,12 @@ def pairs_correct(rank_range,HIDDEN_PERCENT=0.3,mask=True):
 
     return num_correct/num_total
 
-def get_average_signature_error(rank):
-    return sum([find_results(rank)["signature"] for i in range(10)])/10
-
-def plot_hidden_pairs(rank_range,percent_range):
+def plot_pairs_correct(rank_range,percent_range):
+    """ Input: List of Integers, List of Floats
+    Output: Goes through every percent in percent_range
+    Runs pairs_correct, and plots that"""
+    
     pairs = [pairs_correct(rank_range,percent) for percent in percent_range]
     plt.plot(percent_range,pairs)
     plt.show()
-    
+
