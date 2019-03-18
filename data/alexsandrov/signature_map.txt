@@ -1,0 +1,27 @@
+All 1B 2
+Aml 1A 1B
+Bladder 1B 2 5 13
+Breast 1B 2 3 8 13 Other
+Cervix 1B 2 
+Cll 1B 2 9 
+Colorectum 1B 6 10 Other
+Esophageal 1B 2 6 17  
+Glioblastoma 1A 11 Other 
+Glioma_low_grade 1A 5 6 14 
+Head_and_neck 1B 2 4 7 
+Kidney_chromophobe 1A 6 Other 
+Kidney_clear_cell 1B 6 Other 
+Kidney_papillary 2 5 
+Lung_adenocarcinoma 1B 2 4 5 Other 
+Lung_small_cell 4 15 
+Lung_squamous 2 4 5 Other 
+Lymphoma_b_cell 1B 2 5 9 16  
+Melanoma 1B 7 11 
+Myeloma 2 5 
+Neuroblastoma 1b 17
+Ovary 1B 3 
+Pancreas 1B 2 3 6 
+Prostate 1A 6 other 
+Stomach 1A 2 15 17 20 21
+Thyroid 2 5 
+Uterus 1B 2 6 10 12 14
