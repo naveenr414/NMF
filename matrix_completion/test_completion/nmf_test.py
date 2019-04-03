@@ -1,15 +1,23 @@
-from nmf_tensorflow import find_results, find_results_no_mask
-from create_data import create_data, m, n, create_alexsandrov_data
+from nmf_tensorflow import find_results
+from create_data import create_data, m, n
 import numpy as np
 import matplotlib.pyplot as plt
+import time
+np.warnings.filterwarnings('ignore')
 
-create_alexsandrov_data()
+create_data()
 
 def get_average_signature_error(rank):
     """ Input: Integer rank 
     Returns the average signature distance """
-    return sum([find_results(rank)["signature"] for i in range(10)])/10
+    results = [find_results(rank) for i in range(10)]
+    results = [i["signature"] for i in results if i!= None]
 
+    if(len(results) == 0):
+        return 0
+    
+    return sum(results)/len(results)
+    
 def plot_reconstruction(rank):
     """ Input: List of Integers
         Output: Plot of rank vs norm error"""
@@ -56,15 +64,19 @@ def percent_top(rank_range,trials=10,mask=True):
 
 
     results = []
-
+    i = 0
+    
     for i in range(trials):
-        create_alexsandrov_data()
+        create_data()
         temp_data = []
 
         for rank in rank_range:
             if(mask):
-                data = find_results(rank)
-            else:
+                data = find_results(rank,HIDDEN_PERCENT=0.3)
+                while data == None:
+                    print("Restarting",rank)
+                    data = find_results(rank,HIDDEN_PERCENT=0.3)
+            else:   
                 data = find_results_no_mask(rank)
             tuple_data = (data["norm"],data["signature"])
             temp_data.append(tuple_data)
@@ -77,6 +89,7 @@ def percent_top(rank_range,trials=10,mask=True):
             if(signature_sorted.index(norm_sorted[j])<5):
                 num_in_5+=1
         results.append(num_in_5/5)
+        print(results)
 
     return results
 
@@ -86,12 +99,19 @@ def pairs_correct(rank_range,HIDDEN_PERCENT=0.3,mask=True):
     Signature trend based off norm """
     
     temp_data = []
+    
     for rank in rank_range:
+        r = 0
         if mask:
             data = find_results(rank,HIDDEN_PERCENT=HIDDEN_PERCENT)
+            while data == None:
+                r+=1
+                data = find_results(rank,HIDDEN_PERCENT=HIDDEN_PERCENT)
+                if(r>40):
+                    continue    
         else:
             data = find_results_no_mask(rank)
-        tuple_data = (data["norm"],data["signature"])
+        tuple_data = (data["norm"],data["signature"],data["exposure"])
         temp_data.append(tuple_data)
      
     num_correct = 0
@@ -101,18 +121,49 @@ def pairs_correct(rank_range,HIDDEN_PERCENT=0.3,mask=True):
         for j in range(i+1,len(temp_data)):
             num_total+=1
 
-            if(temp_data[i][0]<=temp_data[j][0] and temp_data[i][1]<=temp_data[j][1] or
-               temp_data[i][0]>=temp_data[j][0] and temp_data[i][1]>temp_data[j][1]):
+            if(temp_data[i][0]<=temp_data[j][0] and (temp_data[i][1]<=temp_data[j][1] or temp_data[i][2]<=temp_data[j][2])  or
+               temp_data[i][0]>=temp_data[j][0] and (temp_data[i][1]>temp_data[j][1] or temp_data[i][2]>temp_data[j][2])):
                 num_correct+=1
+            else:
+                print(temp_data[i])
+                print(temp_data[j])
+                print()
 
     return num_correct/num_total
 
+def rank_correct(rank_range,HIDDEN_PERCENT=0.3,mask=True):
+    """ Input: List of Integers
+    Otuput: 0/1 for whether the correct rank is found """
+    
+    temp_data = []
+    real_rank = 6
+    
+    for rank in rank_range:
+        r = 0
+        if mask:
+            data = find_results(rank,HIDDEN_PERCENT=HIDDEN_PERCENT)
+            while data == None:
+                r+=1
+                data = find_results(rank,HIDDEN_PERCENT=HIDDEN_PERCENT)
+                if(r>40):
+                    continue
+        else:
+            data = find_results_no_mask(rank)
+        tuple_data = (rank,data["norm"],data["signature"])
+        temp_data.append(tuple_data)
+
+    if sorted(temp_data,key=lambda x: x[1])[0][0] == real_rank:
+        return 1
+    print(sorted(temp_data,key=lambda x: x[1])[0][0])
+    return 0
+    
 def plot_pairs_correct(rank_range,percent_range):
     """ Input: List of Integers, List of Floats
-    Output: Goes through every percent in percent_range
+        Output: Goes through every percent in percent_range
     Runs pairs_correct, and plots that"""
     
     pairs = [pairs_correct(rank_range,percent) for percent in percent_range]
     plt.plot(percent_range,pairs)
     plt.show()
 
+print(pairs_correct([2,3,4,5,6,7,8,9,10,11]))
