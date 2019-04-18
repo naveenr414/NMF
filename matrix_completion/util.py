@@ -47,3 +47,43 @@ def createNearestNeighborEpsilon(mat,epsilon=0.3,metric="Cosine"):
 
     return graph
 
+def createAgeGraph(age_file,data_file):
+    samples = open(data_file).read().split("\n")[0].split("\t")[1:]
+    for i in range(len(samples)):
+        samples[i] = samples[i][:-1]
+    age_dict = {}
+    ages = open(age_file).read().split("\n")
+    ages = [i.split("\t") for i in ages]
+    for i in ages:
+        if(i[1] == "over_80"):
+            age_dict[i[0]] = 80
+        else:
+            age_dict[i[0]] = int(i[1])
+
+    data = open(data_file).read().split("\n")[1:-1]
+    for i in range(len(data)):
+        data[i] = data[i].split("\t")[1:]
+        data[i] = list(map(int,data[i]))
+
+    data = np.array(data).T
+    i = 0
+    while(i<len(samples)):
+        if samples[i] not in age_dict:
+            del samples[i]
+            data = np.delete(data,i,axis=0)
+        else:
+            i+=1
+
+    similarities = np.zeros((data.shape[0],data.shape[0]))
+    for i in range(len(samples)):
+        for j in range(len(samples)):
+            similarities[i][j] = 1-float(abs(age_dict[samples[i]]-age_dict[samples[j]]))/float(80)
+
+    return data.astype(np.float32),similarities.astype(np.float32)
+
+def normalize(m):
+    for i in range(len(m)):
+        m[i] = np.divide(m[i],np.sum(m[i]))
+
+    return m
+    
