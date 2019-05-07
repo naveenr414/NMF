@@ -1,0 +1,402 @@
+1 - 
+  Graph: Similarity Graph
+  Learning Rate - 3 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Line 1 - Created Graph
+  Line 2-4 - Learning Rate Results
+  Line 5 - Held-out,Lambda (Twice)
+  Line 6 - Imputation Score
+  Line 7 - Time taken 
+2 - 
+  Graph: Similarity Graph
+  Learning Rate - 3 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 10 trials 
+  Line 1 - Created Graph
+  Line 2-4 - Learning Rate Results
+  Line 5 - Held-out,Lambda (Twice)
+  Line 6 - Imputation Score
+  Line 7 - Time taken 
+3 (Different seed) - 
+  Graph: Similarity Graph 
+  Learning Rate - 3 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Line 1 - Created Graph
+  Line 2-4 - Learning Rate Results
+  Line 5 - Held-out,Lambda (Twice)
+  Line 6 - Imputation Score
+  Line 7 - Time taken  
+4 - 
+  Graph: Random graph (each number is uniform from 0-1) 
+  Learning Rate - 3 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Line 1 - Created Graph
+  Line 2-4 - Learning Rate Results
+  Line 5 - Held-out,Lambda (Twice)
+  Line 6 - Imputation Score
+  Line 7 - Time taken  
+5 - 
+  Graph: Random graph (each number is uniform from 0-1) 
+  Learning Rate - 3 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Line 1 - Created Graph
+  Line 2-4 - Learning Rate Results
+  Line 5 - Held-out,Lambda (Twice)
+  Line 6 - Imputation Score
+  Line 7 - Time taken  
+6 - 
+  Found Signatures
+  Graph: Similarity Graph 
+  Learning Rate - 6 Step Grid Search 
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-4 - Learning Rate Results
+  Line 5 - Held-out,Lambda (Twice)
+  Line 6 - Imputation Score
+  Line 7 - Time taken  
+7 - 
+  Found Signatures
+  Graph: Similarity Graph 
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken  
+8 - 
+  Found Signatures
+  Graph: K nearest neighbors graph, k = 50 (Note didn't divide 
+    weight matrix by the sum) 
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken  
+9 - 
+  Found Signatures
+  Graph: Random graph  
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken
+10 - 
+  Found Signatures
+  Graph: Similarity Graph  
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+11 - 
+  Found Signatures
+  Graph: KNN (k=50), not normalized  
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+
+13 - 
+  Found Signatures
+  Graph: KNN 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken  
+14 - 
+  Found Signatures
+  Graph: Randomized KNN 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken     
+15 - 
+  Found Signatures
+  Graph: Randomly permuted similarities
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken     
+16 - 
+  Found Signatures
+  Graph: Similarities
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken  
+17 (1271540-1271569) - 
+  Found Signatures
+  Graph: Similarities
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.2
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken 
+18 (1271570-1271599) - 
+  Found Signatures
+  Graph: Similarities permuted 
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.2
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken 
+19 (1271600-1271809) - 
+  Found Signatures
+  Graph: KNN 
+    k = 5,10,25,50,100,200,250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.1
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.2
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken 
+20 (1271810 - 1272019) - 
+  Found Signatures
+  Graph: KNN randomly swapped 
+    k = 5,10,25,50,100,200,250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 1000 iterations
+  Held-out percentage: 0.2
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken   
+  Found Signatures
+  Graph: KNN, not normalized 
+    k: 5, 10, 25, 50, 100, 150, 200, 250
+  Learning Rate - 6 Step Grid Search 
+  Ran gradient descent 4000 iterations
+  Held-out percentage: 0.2
+  Lambda: 0,1,10^2,10^3,10^4,10^5,10^6,10^7,10^8
+  Score determined by taking min of 5 trials 
+  Rank: 3,4,5,6,7
+  Line 1 - Created Graph
+  Line 2-7 - Learning Rate Results
+  Line 8 - Held-out,Lambda (Twice)
+  Line 9 - Imputation Score
+  Line 10 - Signatures
+  Line 11 - Time taken 
+21 (1272054 - 1272088) 
+  New way to find best lamb,lr pair
+22 (1272094-1272123)
+  New way with weight matrix imputed
+23 (127124-1272153)
+  New way with weight matrix imputed and permuted 
+24 (1272197-1272226)
+  Lambda = 0

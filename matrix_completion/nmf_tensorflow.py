@@ -8,28 +8,17 @@ from util import createNearestNeighbor, createAgeGraph,normalize
 from cost_functions import *
 import cost_functions
 import time
-import client_parser 
+import client_parser
+import time
+from libraries.mutation_signatures_visualization import sbs_signature_plot
+import matplotlib.pyplot as plt 
 
+np.random.seed(0)
 HIDDEN_PERCENT = 0.3
 
-data,patients = client_parser.parse_counts("data/counts.tsv")
-weight_matrix = client_parser.parse_cna("data/cna.tsv")
-weight_patients = client_parser.parse_cna_patients("data/cna_patients.tsv")
+data,patients,categories = client_parser.parse_counts("data/brca_data.tsv")
+weight_matrix = client_parser.matrix("data/brca_graph.tsv",patients)
 
-used_weight_patients = []
-used_patients = []
-for i in range(len(patients)):
-    if patients[i] in weight_patients:
-        used_patients.append(i)
-
-for i in range(len(weight_patients)):
-    if weight_patients[i] in patients:
-        used_weight_patients.append(i)
-
-data = data[used_patients]
-used_weight_patients = np.array(used_weight_patients)
-weight_matrix = weight_matrix[used_weight_patients[:,None],
-                              used_weight_patients]
 
 shape = data.shape
 all_pairs = [(i, j) for i in range(shape[0]) for j in
@@ -71,7 +60,7 @@ def get_clip(W,H):
     clip = tf.group(clip_W, clip_H)
     return clip
 
-def find_results(rank,f,k=5,use_random=False,lr = 0.0001):
+def find_results(rank,f,use_random=False,lr = 0.0001):
     global weight_matrix
     
     bool_mask = V_masked.notnull()
@@ -104,7 +93,7 @@ def find_results(rank,f,k=5,use_random=False,lr = 0.0001):
     i = 0
     previous_cost = sess.run(cost)
     
-    while np.isfinite(sess.run(cost)) and (i<=1000): #or previous_cost-sess.run(cost)>10):
+    while np.isfinite(sess.run(cost)) and (i<=2000): #or previous_cost-sess.run(cost)>10):
         previous_cost = sess.run(cost)
         sess.run(train_step)
         sess.run(clip)
@@ -112,23 +101,48 @@ def find_results(rank,f,k=5,use_random=False,lr = 0.0001):
 
     learnt_W = sess.run(W)
     learnt_H = sess.run(H)
+
         
     difference = np.linalg.norm((data- learnt_W.dot(learnt_H))[~bool_mask])
+    sbs_signature_plot(pd.DataFrame(learnt_H,columns=categories))
+    plt.savefig(str(difference)+".jpg")
 
     return difference
 
-def run_trials(rank,f,k=5,use_random=False,lr=.0001):
-    return np.min([find_results(rank,f,k=k,use_random=use_random,lr=lr) for i in range(5)])
+def run_trials(rank,f,use_random=False,lr=.0001):
+    return np.min([find_results(rank,f,use_random=use_random,lr=lr) for i in range(5)])
 
-lr = 10**(-5.25)
-cost_functions.lamb = 0
-baseline = run_trials(5,frobenius,k=5,lr=lr)
+
+def find_lr(lamb):
+    possible = [-1,-5,-9]
+    distance = 4
+    cost_functions.lamb = lamb
+    for i in range(3):
+        results = [run_trials(5,frobenius,lr=10**j) for j in possible]
+        best_score = possible[results.index(min(results))]
+        distance/=2
+        possible = [best_score-distance,best_score,best_score+distance]
+        print(possible)
+
+    return 10**possible[1]
+
+#finding learning rate
+t = time.time()
+lr = 10**-5 #find_lr(0)
+cost_functions.lamb = 0   
+baseline = run_trials(5,frobenius,lr=lr)
 scores = []
-for i in [0,0.5,1,1.5,2]:
+print(baseline)
+
+"""
+for i in [0,1,2,3,4,5,6,7,8,9,10]:
     cost_functions.lamb = 10**i
-    scores.append((run_trials(5,frobenius,k=5,lr=lr),i))
+    lr = find_lr(10**i)
+    scores.append((run_trials(5,frobenius,lr=lr),i))
+    print(scores)
 
 for i in range(len(scores)):
     scores[i] = (scores[i][0]/baseline,scores[i][1])
-print(min(scores,key=lambda x: x[0]))
 
+print(min(scores,key=lambda x: x[0]))
+print(time.time()-t)"""

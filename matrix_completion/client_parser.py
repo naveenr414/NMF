@@ -16,7 +16,9 @@ def parse(file_name):
     return all_patients
 
 def parse_counts(file_name):
-    f = open(file_name).read().split("\n")[1:-1]
+    f = open(file_name).read().split("\n")[:-1]
+    categories = f[0].split("\t")[1:]
+    f = f[1:]
     numbers = []
     patients = []
     for i in range(len(f)):
@@ -24,7 +26,7 @@ def parse_counts(file_name):
         patients.append("-".join(data[0].split("-")[:3]))
         numbers.append([float(x) for x in data[1:]])
 
-    return np.array(numbers).astype(np.float32),patients
+    return np.array(numbers).astype(np.float32),patients,categories
 
 def parse_cna(file_name):
     f = open(file_name).read().split("\n")[1:-1]
@@ -88,7 +90,24 @@ def number_matrix(file_name,patients,category):
                     if value_one not in ['NaN',''] and value_two not in ['NaN','']:    
                         matrix[i,j] = float(value_one)-float(value_two)
     matrix/=np.sum(np.abs(matrix))
-    return np.sum(matrix)-matrix 
+    return np.sum(matrix)-matrix
+
+def matrix(file_name,patients):
+    weights = np.zeros((len(patients),len(patients)))
+    f = open(file_name).read().split("\n")
+    for i in f:
+        name_one = i.split("\t")[0]
+        name_two = i.split("\t")[1]
+        score = float(i.split("\t")[2])
+
+        weights[patients.index(name_one),patients.index(name_two)] = score
+        weights[patients.index(name_two),patients.index(name_one)] = score
+
+    for i in range(len(patients)):
+        weights[i,i] = 1
+
+
+    return weights
 
                         
     
