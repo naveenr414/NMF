@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 def parse(file_name):
     f = open(file_name).read().split("\n")[:-1]
@@ -13,38 +12,9 @@ def parse(file_name):
         for j in range(1,len(cols)):
             current_patient[cols[j].lower()] = f[i][j]
         all_patients[name] = current_patient
-
+    
     return all_patients
 
-def select_rows(data,current_rows,target_rows):
-    allowed_rows = [i for i in range(len(current_rows)) if current_rows[i] in target_rows]
-    return data[allowed_rows]
-
-def parse_dna(file_name,given_patients,selected_pathways=["BRCA1","BRCA2","RAD51"]):
-    f = open(file_name).read().split("\n")[:-1]
-    f = [i.split("\t") for i in f]
-    dna_pathways = f[0]
-    
-    has_pathway = []
-    used_patients = []
-    for sample in f[1:]:
-        if sample[0] in given_patients:
-            used_patients.append(sample[0])
-            for pathway in selected_pathways:
-                if int(sample[dna_pathways.index(pathway)]):
-                    has_pathway.append(True)
-                    break
-            else:
-                has_pathway.append(False)
-
-    weight_matrix = np.zeros((len(used_patients),len(used_patients)))
-
-    for i in range(len(used_patients)):
-        for j in range(len(used_patients)):
-            weight_matrix[i][j] = int(has_pathway[i] == has_pathway[j])
-    
-    return weight_matrix,used_patients
-    
 def parse_counts(file_name):
     f = open(file_name).read().split("\n")[:-1]
     categories = f[0].split("\t")[1:]
@@ -97,7 +67,7 @@ def categorical_matrix(file_name,patients,category):
                     value_one = patient_dict[name_one][category]
                     value_two = patient_dict[name_two][category]
 
-                    if value_one not in ['NaN',''] and value_two not in ['NaN','']:
+                    if value_one not in ['NaN',''] and value_two not in ['NaN','']:    
                         if value_one == value_two:
                             matrix[i,j] = 1
     return matrix
@@ -117,7 +87,7 @@ def number_matrix(file_name,patients,category):
                     value_one = patient_dict[name_one][category]
                     value_two = patient_dict[name_two][category]
 
-                    if value_one not in ['NaN',''] and value_two not in ['NaN','']:
+                    if value_one not in ['NaN',''] and value_two not in ['NaN','']:    
                         matrix[i,j] = float(value_one)-float(value_two)
     matrix/=np.sum(np.abs(matrix))
     return np.sum(matrix)-matrix
@@ -138,3 +108,6 @@ def matrix(file_name,patients):
 
 
     return weights
+
+                        
+    

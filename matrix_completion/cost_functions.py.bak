@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow as tf 
 
 lamb = 0
 lamb_tf=0
@@ -8,7 +8,6 @@ graph_cost=0
 def frobenius(A,tf_mask,WH,WTLW):
     global graph_cost
     global matrix_cost
-    global lamb 
     lamb_tf = tf.constant(float(lamb))
     matrix_cost = tf.reduce_sum(tf.pow(tf.boolean_mask(A, tf_mask)
                          - tf.boolean_mask(WH, tf_mask), 2))
