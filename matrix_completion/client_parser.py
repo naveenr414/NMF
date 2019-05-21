@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 def parse(file_name):
+    """ Parse mutations file"""
     f = open(file_name).read().split("\n")[:-1]
     cols = f[0].split("\t")
 
@@ -21,6 +22,7 @@ def select_rows(data,current_rows,target_rows):
     return data[allowed_rows]
 
 def parse_dna(file_name,given_patients,selected_pathways=["BRCA1","BRCA2","RAD51"]):
+    """ Parse pathways file"""
     f = open(file_name).read().split("\n")[:-1]
     f = [i.split("\t") for i in f]
     dna_pathways = f[0]
@@ -46,6 +48,7 @@ def parse_dna(file_name,given_patients,selected_pathways=["BRCA1","BRCA2","RAD51
     return weight_matrix,used_patients
     
 def parse_counts(file_name):
+    """ Parse mutations"""
     f = open(file_name).read().split("\n")[:-1]
     categories = f[0].split("\t")[1:]
     f = f[1:]
@@ -103,6 +106,7 @@ def categorical_matrix(file_name,patients,category):
     return matrix
 
 def number_matrix(file_name,patients,category):
+    """ Things like age"""
     patient_dict = parse(file_name)
     category = category.lower()
     matrix = np.zeros((len(patients),len(patients)))
@@ -122,7 +126,7 @@ def number_matrix(file_name,patients,category):
     matrix/=np.sum(np.abs(matrix))
     return np.sum(matrix)-matrix
 
-def matrix(file_name,patients):
+def matrix(file_name,patients):    
     weights = np.zeros((len(patients),len(patients)))
     f = open(file_name).read().split("\n")
     for i in f:

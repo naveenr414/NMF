@@ -70,7 +70,6 @@ def plot_errors(matrix_cost,graph_cost):
     """ Takes in an array of matrix_costs and graph_costs
     Plots matrix cost in red and graph cost in blue"""
     
-    
     plt.scatter(range(len(matrix_cost)),matrix_cost,c='r',marker=',')
     plt.scatter(range(len(graph_cost)),graph_cost,c='b',marker=',')
     plt.show()
