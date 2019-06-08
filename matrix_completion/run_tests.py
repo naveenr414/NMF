@@ -3,7 +3,11 @@ from copy import deepcopy
 import numpy as np
 import client_parser
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
 import util
+
+def log_result(result):
+    print(result['imputation_error'])
 
 def run_trials(data,weight,params,CROSS_VALIDATION=5):
     """ The cross validation is the number of groups that all pairs is split up into
@@ -15,15 +19,19 @@ def run_trials(data,weight,params,CROSS_VALIDATION=5):
     np.random.shuffle(all_pairs)
 
     results = []
+    start_list = [int(i/CROSS_VALIDATION*number_elements) for i in range(CROSS_VALIDATION)]
+    end_list = [int((i+1)/CROSS_VALIDATION*number_elements) for i in range(CROSS_VALIDATION)]
+    new_params = [deepcopy(params) for i in range(CROSS_VALIDATION)]
     for i in range(CROSS_VALIDATION):
-        new_params = deepcopy(params)
-        start = int(i/CROSS_VALIDATION*number_elements)
-        end = int((i+1)/CROSS_VALIDATION*number_elements)
-        new_params['hidden_pairs'] = all_pairs[start:end]
-        
-        results.append(find_results(data,weight,new_params))
+        new_params[i]['hidden_pairs'] = all_pairs[start_list[i]:end_list[i]]        
 
-    return results
+    pool = Pool(processes=4)
+    for i in range(CROSS_VALIDATION):
+        pool.apply_async(find_results,args=(data,weight,new_params[i]))
+    pool.close()
+    pool.join()
+
+    return True
 
 def grid_search(data,weight,lr_params,lamb_params,constant_params,iterations):
     """Grid searches through the data with weight_matrix
@@ -75,13 +83,11 @@ def plot_errors(matrix_cost,graph_cost):
     plt.show()
 
 data,patients,categories = client_parser.parse_counts("data/brca_data.tsv")
-weight,real_patients = client_parser.parse_dna("data/dna_brca.tsv",patients)
+weight,weight_patients = client_parser.parse_pathways("data/breast_pathways.tsv",["BRCA1","BRCA2","RAD50"])
+real_patients = list(set(patients).intersection(set(weight_patients)))
 data = client_parser.select_rows(data,patients,real_patients)
+weight = client_parser.select_rows_and_columns(weight,weight_patients,real_patients)
 weight = util.normalize(weight)
-params = {'lr':10**-5,'lambda':10**4,'rank':5}
+params = {'lr':10**-5,'lambda':0,'rank':5}
 
-for lamb in range(0,6):
-    params['lambda'] = 10**lamb
-    trial = run_trials(data,weight,params,CROSS_VALIDATION=10)
-    print(np.mean([i['imputation_error'] for i in trial]))
-    plot_errors(trial[0]['matrix_error'],trial[0]['graph_error'])
+results = run_trials(data,weight,params,CROSS_VALIDATION=10)

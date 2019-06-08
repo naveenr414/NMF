@@ -21,6 +21,9 @@ def select_rows(data,current_rows,target_rows):
     allowed_rows = [i for i in range(len(current_rows)) if current_rows[i] in target_rows]
     return data[allowed_rows]
 
+def select_rows_and_columns(data,current_rows,target_rows):
+    return select_rows(select_rows(data.T,current_rows,target_rows).T,current_rows,target_rows)
+
 def parse_dna(file_name,given_patients,selected_pathways=["BRCA1","BRCA2","RAD51"]):
     """ Parse pathways file"""
     f = open(file_name).read().split("\n")[:-1]
@@ -142,3 +145,23 @@ def matrix(file_name,patients):
 
 
     return weights
+
+def parse_pathways(file_name,pathways_wanted):
+    df = pd.read_csv(file_name, sep='\t')
+    names = df['id'].tolist()
+    df = df[pathways_wanted]
+    has_mutation = []
+    for i,row in df.iterrows():
+        for pathway in pathways_wanted:
+            if row[pathway] != 0:
+                has_mutation.append(1)
+                break
+        else:
+            has_mutation.append(0)
+
+    similarity_matrix = np.zeros((len(names),len(names)))
+    for i in range(len(names)):
+        for j in range(len(names)):
+            similarity_matrix[i,j] = int(has_mutation[i] == has_mutation[j])
+    
+    return similarity_matrix,names

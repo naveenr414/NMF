@@ -9,7 +9,7 @@ import networkx as nx
 
 np.set_printoptions(suppress=True)
 
-TARGET_DIFFERENCE = 0.01
+TARGET_DIFFERENCE = 0.1
 max_iterations = 100000
 
 def create_mask(matrix,hidden_pairs):
